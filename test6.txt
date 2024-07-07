@@ -444,3 +444,11 @@ int main()
 
     return 0;
 }
+This update focuses on improving some long-standing sore points in the app. Most notably, we have overhauled the app interface for better support of right-to-left (RTL) languages. Now when the app language is set to an RTL language, the entire interface will be mirrored. We have also given a lot of attention to improving the editing and reading experience of footnotes. This release is jam-packed with bug fixes, but you might also notice some performance improvements when loading the app and while editing.
+
+Highlights
+RTL Support. The interface direction is now mirrored when the app is set to an RTL language.
+Updated left sidebar layout. A new vault switcher is now shown at the bottom. The app ribbon can now be hidden in settings or by right-clicking on the ribbon and selecting "Hide ribbon."
+Character and word count is now updated based on the current text selection.
+Faster workspace loading.
+Faster editor parsing.
