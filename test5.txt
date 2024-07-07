@@ -45,6 +45,33 @@ typedef struct Ray
     vec3 startPoint = vec3(0, 0, 0);    // 起点
     vec3 direction = vec3(0, 0, 0);     // 方向
 }Ray;
+// 三角形
+class Triangle : public Shape
+{
+public:
+    Triangle(){}
+    Triangle(vec3 P1, vec3 P2, vec3 P3, vec3 C) 
+    { 
+        p1 = P1, p2 = P2, p3 = P3; 
+        material.normal = normalize(cross(p2 - p1, p3 - p1)); material.color = C;
+    }
+    vec3 p1, p2, p3;    // 三顶点
+    Material material;  // 材质
+
+    // 与光线求交
+    HitResult intersect(Ray ray) 
+    { 
+        HitResult res;
+
+        vec3 S = ray.startPoint;        // 射线起点
+        vec3 d = ray.direction;         // 射线方向
+        vec3 N = material.normal;       // 法向量
+        if (dot(N, d) > 0.0f) N = -N;   // 获取正确的法向量
+
+        // 如果视线和三角形平行
+        if (fabs(dot(N, d)) < 0.00001f) return res;
+
+        // 距离
 
 // 物体表面材质定义
 typedef struct Material
@@ -75,33 +102,7 @@ public:
     virtual HitResult intersect(Ray ray) { return HitResult(); }
 };
 
-// 三角形
-class Triangle : public Shape
-{
-public:
-    Triangle(){}
-    Triangle(vec3 P1, vec3 P2, vec3 P3, vec3 C) 
-    { 
-        p1 = P1, p2 = P2, p3 = P3; 
-        material.normal = normalize(cross(p2 - p1, p3 - p1)); material.color = C;
-    }
-    vec3 p1, p2, p3;    // 三顶点
-    Material material;  // 材质
 
-    // 与光线求交
-    HitResult intersect(Ray ray) 
-    { 
-        HitResult res;
-
-        vec3 S = ray.startPoint;        // 射线起点
-        vec3 d = ray.direction;         // 射线方向
-        vec3 N = material.normal;       // 法向量
-        if (dot(N, d) > 0.0f) N = -N;   // 获取正确的法向量
-
-        // 如果视线和三角形平行
-        if (fabs(dot(N, d)) < 0.00001f) return res;
-
-        // 距离
         float t = (dot(N, p1) - dot(S, N)) / dot(d, N);
         if (t < 0.0005f) return res;    // 如果三角形在相机背面
 
@@ -443,4 +444,21 @@ int main()
     imshow(image);
 
     return 0;
+}
+
+
+// 返回距离最近 hit 的结果
+HitResult shoot(vector<Shape*>& shapes, Ray ray)
+{
+    HitResult res, r;
+    res.distance = 1145141919.810f; // inf
+
+    // 遍历所有图形，求最近交点
+    for (auto& shape : shapes)
+    {
+        r = shape->intersect(ray);
+        if (r.isHit && r.distance < res.distance) res = r;  // 记录距离最近的求交结果
+    }
+
+    return res;
 }
