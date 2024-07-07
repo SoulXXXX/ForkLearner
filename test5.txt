@@ -44,37 +44,7 @@ typedef struct Ray
 {
     vec3 startPoint = vec3(0, 0, 0);    // 起点
     vec3 direction = vec3(0, 0, 0);     // 方向
-}Ray
-// 光线求交结果
-typedef struct HitResult
-{
-    bool isHit = false;             // 是否命中
-    double distance = 0.0f;         // 与交点的距离
-    vec3 hitPoint = vec3(0, 0, 0);  // 光线命中点
-    Material material;              // 命中点的表面材质
-}HitResult;
-
-
-// 物体表面材质定义
-typedef struct Material
-{
-    bool isEmissive = false;        // 是否发光
-    vec3 normal = vec3(0, 0, 0);    // 法向量
-    vec3 color = vec3(0, 0, 0);     // 颜色
-    double specularRate = 0.0f;     // 反射光占比
-    double roughness = 1.0f;        // 粗糙程度
-    double refractRate = 0.0f;      // 折射光占比
-    double refractAngle = 1.0f;     // 折射率
-    double refractRoughness = 0.0f; // 折射粗糙度
-}Material;
-
-class Shape
-{
-public:
-    Shape(){}
-    virtual HitResult intersect(Ray ray) { return HitResult(); }
-};
-
+}Ray;
 // 三角形
 class Triangle : public Shape
 {
@@ -102,6 +72,28 @@ public:
         if (fabs(dot(N, d)) < 0.00001f) return res;
 
         // 距离
+
+// 物体表面材质定义
+typedef struct Material
+{
+    bool isEmissive = false;        // 是否发光
+    vec3 normal = vec3(0, 0, 0);    // 法向量
+    vec3 color = vec3(0, 0, 0);     // 颜色
+    double specularRate = 0.0f;     // 反射光占比
+    double roughness = 1.0f;        // 粗糙程度
+    double refractRate = 0.0f;      // 折射光占比
+    double refractAngle = 1.0f;     // 折射率
+    double refractRoughness = 0.0f; // 折射粗糙度
+}Material;
+
+class Shape
+{
+public:
+    Shape(){}
+    virtual HitResult intersect(Ray ray) { return HitResult(); }
+};
+
+
         float t = (dot(N, p1) - dot(S, N)) / dot(d, N);
         if (t < 0.0005f) return res;    // 如果三角形在相机背面
 
@@ -443,4 +435,21 @@ int main()
     imshow(image);
 
     return 0;
+}
+
+
+// 返回距离最近 hit 的结果
+HitResult shoot(vector<Shape*>& shapes, Ray ray)
+{
+    HitResult res, r;
+    res.distance = 1145141919.810f; // inf
+
+    // 遍历所有图形，求最近交点
+    for (auto& shape : shapes)
+    {
+        r = shape->intersect(ray);
+        if (r.isHit && r.distance < res.distance) res = r;  // 记录距离最近的求交结果
+    }
+
+    return res;
 }
